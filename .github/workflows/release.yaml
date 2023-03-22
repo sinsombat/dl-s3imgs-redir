@@ -6,7 +6,6 @@ on:
 
 env:
   IMAGE_NAME: dl-s3imgs-redir
-  GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
 
 jobs:
   build:
@@ -15,26 +14,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set output
-        id: vars
-        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: Check output
-        env:
-          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+      - name: Login gh container registry
+        run: echo ${{ secrets.G_TOKEN }} | docker login ghcr.io -u USERNAME --password-stdin
+      - name: Build
+        run: docker build --cache-from ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/*/} --build-arg APP_COMMIT_ID=$(echo ${GITHUB_SHA} | cut -c1-7) -t ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF##*/} .
+      - name: Push
         run: |
-          echo $RELEASE_VERSION
-          echo ${{ steps.vars.outputs.tag }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }}
-            ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
-          build-args: |
-            VERSION=${{ env.IMAGE_TAG }}
-        env:
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          docker push ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/*/}
+          docker push ghcr.io/${GITHUB_REPOSITORY,,}:latest
+      
 
 
