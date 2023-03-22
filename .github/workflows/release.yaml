@@ -6,9 +6,7 @@ on:
 
 env:
   IMAGE_NAME: dl-s3imgs-redir
-  IMAGE_TAG: ${{ github.ref }}
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  IMAGE_TAG: ${{ GITHUB_REF#refs/*/ }}
   GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
 
 jobs:
@@ -29,8 +27,6 @@ jobs:
           build-args: |
             VERSION=${{ env.IMAGE_TAG }}
         env:
-          DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ env.DOCKER_PASSWORD }}
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
 
 
