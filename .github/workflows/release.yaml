@@ -17,9 +17,9 @@ jobs:
       - name: Login gh container registry
         run: echo ${{ secrets.G_TOKEN }} | docker login ghcr.io -u USERNAME --password-stdin
       - name: Build
-        run: docker build --cache-from ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/*/} --build-arg APP_COMMIT_ID=$(echo ${GITHUB_SHA} | cut -c1-7) -t ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF##*/} .
+        run: docker build -t ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/*/} .
       - name: Push
-        run: docker push ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/*/} && docker push ghcr.io/${GITHUB_REPOSITORY,,}:latest
+        run: docker push ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/*/}
       
 
 
