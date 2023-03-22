@@ -6,7 +6,6 @@ on:
 
 env:
   IMAGE_NAME: dl-s3imgs-redir
-  IMAGE_TAG: ${{ GITHUB_REF#refs/*/ }}
   GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
 
 jobs:
@@ -16,13 +15,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Set output
+        id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: Check output
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ steps.vars.outputs.tag }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }}
             ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
           build-args: |
             VERSION=${{ env.IMAGE_TAG }}
