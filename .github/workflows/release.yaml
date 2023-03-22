@@ -9,7 +9,7 @@ env:
   IMAGE_TAG: ${{ github.ref }}
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
 
 jobs:
   build:
