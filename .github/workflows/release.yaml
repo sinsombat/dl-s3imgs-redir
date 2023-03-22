@@ -1,0 +1,36 @@
+name: Release Workflow
+
+on:
+  release:
+    types: [created]
+
+env:
+  IMAGE_NAME: dl-s3imgs-redir
+  IMAGE_TAG: ${{ github.ref }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    name: Build and push image
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
+          build-args: |
+            VERSION=${{ env.IMAGE_TAG }}
+        env:
+          DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ env.DOCKER_PASSWORD }}
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+
+
