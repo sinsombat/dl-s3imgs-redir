@@ -117,6 +117,10 @@ func zipFile(fileDir string) (zipFilePath string, err error) {
 		}
 
 		// Create a new zip writer for the file
+		if header.Name == (fileDir + string(filepath.Separator)) {
+			return err
+		}
+
 		writer, err := zipWriter.CreateHeader(header)
 		if err != nil {
 			return err
