@@ -31,22 +31,24 @@ type Restructure struct {
 }
 
 func (r *Restructure) ModifyDownload() (zipFilePath string, err error) {
+	errCh := make(chan error)
+
 	for _, item := range r.Data {
 		log.Printf("Row: %+v", item)
 		for i := 1; i <= 9; i++ {
-			err = saveFile(r, item, i)
-			if err != nil {
-				continue
-			}
+			go saveFile(r, item, i, errCh)
 		}
+	}
+
+	for i := 0; i < len(r.Data)*9; i++ {
+		<-errCh
 	}
 
 	zipFilePath, err = zipFile(r.RootDir)
 	return
 }
 
-func saveFile(r *Restructure, item Data, i int) (err error) {
-
+func saveFile(r *Restructure, item Data, i int, errCh chan<- error) {
 	imageNo := strconv.FormatInt(int64(i), 10)
 	sourceFileName := item.Source.Path + "/" + item.Source.Name + "-L" + imageNo + ".jpg"
 	destinationBaseDir := fmt.Sprintf("%s/%s", r.RootDir, item.Destination.Path)
@@ -57,6 +59,7 @@ func saveFile(r *Restructure, item Data, i int) (err error) {
 	destinationFile, err := os.Create(destinationFileName)
 	if err != nil {
 		fmt.Println("failed to create file, ", err)
+		errCh <- err
 		return
 	}
 	defer destinationFile.Close()
@@ -70,11 +73,12 @@ func saveFile(r *Restructure, item Data, i int) (err error) {
 	if err != nil {
 		fmt.Println(err, " File : ", sourceFileName)
 		os.Remove(destinationFileName)
+		errCh <- err
 		return
 	}
 	fmt.Println("Downloaded", destinationFile.Name(), numBytes, "bytes")
 	// Write the downloaded contents to the local file
-	return
+	errCh <- nil
 }
 
 func zipFile(fileDir string) (zipFilePath string, err error) {
