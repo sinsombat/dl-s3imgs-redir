@@ -33,11 +33,20 @@ type Restructure struct {
 func (r *Restructure) ModifyDownload() (zipFilePath string, err error) {
 	for _, item := range r.Data {
 		log.Printf("Row: %+v", item)
+
+		// create a channel
+		c := make(chan int)
+
 		for i := 1; i <= 9; i++ {
-			err = saveFile(r, item, i)
-			if err != nil {
-				continue
-			}
+			go func(r *Restructure, item Data, i int, c chan int) {
+				_ = saveFile(r, item, i)
+				c <- i
+			}(r, item, i, c)
+		}
+
+		// wait for all files to be downloaded
+		for i := 1; i <= 9; i++ {
+			<-c
 		}
 	}
 
