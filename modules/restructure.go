@@ -14,10 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-type IRestructure interface {
-	Modify() error
-}
-
 type Directory struct {
 	Path string
 	Name string
@@ -35,14 +31,21 @@ type Restructure struct {
 }
 
 func (r *Restructure) ModifyDownload() (zipFilePath string, err error) {
+	// create a channel
+	c := make(chan int)
 	for _, item := range r.Data {
 		log.Printf("Row: %+v", item)
 		for i := 1; i <= 9; i++ {
-			err = saveFile(r, item, i)
-			if err != nil {
-				continue
-			}
+			go func(r *Restructure, item Data, i int, c chan int) {
+				saveFile(r, item, i)
+				c <- i
+			}(r, item, i, c)
 		}
+	}
+
+	for i := 0; i < len(r.Data)*9; i++ {
+		// wait for all files to be downloaded
+		<-c
 	}
 
 	zipFilePath, err = zipFile(r.RootDir)
@@ -72,7 +75,7 @@ func saveFile(r *Restructure, item Data, i int) (err error) {
 		})
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err, " File : ", sourceFileName)
 		os.Remove(destinationFileName)
 		return
 	}
