@@ -14,10 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-type IRestructure interface {
-	Modify() error
-}
-
 type Directory struct {
 	Path string
 	Name string
@@ -72,7 +68,7 @@ func saveFile(r *Restructure, item Data, i int) (err error) {
 		})
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err, " File : ", sourceFileName)
 		os.Remove(destinationFileName)
 		return
 	}
