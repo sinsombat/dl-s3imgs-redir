@@ -58,6 +58,11 @@ func download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	suffix := strings.Trim(r.PostFormValue("suffix"), " ")
+	if suffix == "" {
+		suffix = "-L"
+	}
+
 	// Get uploaded file from request
 	file, header, err := r.FormFile("file")
 	if err != nil {
@@ -94,6 +99,7 @@ func download(w http.ResponseWriter, r *http.Request) {
 		Data:    data,
 		Client:  client,
 		RootDir: currentTime.Format("2006-01-02") + "-" + strings.Join(strings.Split(middleware.GetReqID(r.Context()), "/"), "-"),
+		Suffix:  suffix,
 	}
 
 	zipFilePath, err := restructureWorker.ModifyDownload()
