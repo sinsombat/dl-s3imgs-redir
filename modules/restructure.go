@@ -25,10 +25,11 @@ type Data struct {
 }
 
 type Restructure struct {
-	Data    []Data
-	Client  Client
-	RootDir string
-	Suffix  string
+	Data              []Data
+	Client            Client
+	RootDir           string
+	SourceSuffix      string
+	DestinationSuffex string
 }
 
 func (r *Restructure) ModifyDownload() (zipFilePath string, err error) {
@@ -56,9 +57,9 @@ func (r *Restructure) ModifyDownload() (zipFilePath string, err error) {
 func saveFile(r *Restructure, item Data, i int) (err error) {
 
 	imageNo := strconv.FormatInt(int64(i), 10)
-	sourceFileName := item.Source.Path + "/" + item.Source.Name + r.Suffix + imageNo + ".jpg"
+	sourceFileName := item.Source.Path + "/" + item.Source.Name + r.SourceSuffix + imageNo + ".jpg"
 	destinationBaseDir := fmt.Sprintf("%s/%s", r.RootDir, item.Destination.Path)
-	destinationFileName := fmt.Sprintf("%s/%s-a%d.jpg", destinationBaseDir, item.Destination.Name, i)
+	destinationFileName := fmt.Sprintf("%s/%s%s%d.jpg", destinationBaseDir, item.Destination.Name, r.DestinationSuffex, i)
 
 	ensureBaseDir(destinationBaseDir)
 

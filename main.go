@@ -58,9 +58,14 @@ func download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	suffix := strings.Trim(r.PostFormValue("suffix"), " ")
-	if suffix == "" {
-		suffix = "-L"
+	sourceSuffix := strings.Trim(r.PostFormValue("sourceSuffix"), " ")
+	if sourceSuffix == "" {
+		sourceSuffix = "-L"
+	}
+
+	destinationSuffix := strings.Trim(r.PostFormValue("destinationSuffix"), " ")
+	if destinationSuffix == "" {
+		destinationSuffix = "-a"
 	}
 
 	// Get uploaded file from request
@@ -96,10 +101,11 @@ func download(w http.ResponseWriter, r *http.Request) {
 	log.Println("RequestId : ", middleware.GetReqID(r.Context()))
 	//modify Re-Structure
 	restructureWorker := modules.Restructure{
-		Data:    data,
-		Client:  client,
-		RootDir: currentTime.Format("2006-01-02") + "-" + strings.Join(strings.Split(middleware.GetReqID(r.Context()), "/"), "-"),
-		Suffix:  suffix,
+		Data:              data,
+		Client:            client,
+		RootDir:           currentTime.Format("2006-01-02") + "-" + strings.Join(strings.Split(middleware.GetReqID(r.Context()), "/"), "-"),
+		SourceSuffix:      sourceSuffix,
+		DestinationSuffex: destinationSuffix,
 	}
 
 	zipFilePath, err := restructureWorker.ModifyDownload()
