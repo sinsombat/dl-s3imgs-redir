@@ -56,10 +56,19 @@ func (r *Restructure) ModifyDownload() (zipFilePath string, err error) {
 
 func saveFile(r *Restructure, item Data, i int) (err error) {
 
-	imageNo := strconv.FormatInt(int64(i), 10)
-	sourceFileName := item.Source.Path + "/" + item.Source.Name + r.SourceSuffix + imageNo + ".jpg"
+	sourceImageNo := ""
+	destinationImageNo := ""
+
+	if r.SourceSuffix != "" {
+		sourceImageNo = strconv.FormatInt(int64(i), 10)
+	}
+	if r.DestinationSuffex != "" {
+		destinationImageNo = strconv.FormatInt(int64(i), 10)
+	}
+
+	sourceFileName := item.Source.Path + "/" + item.Source.Name + r.SourceSuffix + sourceImageNo + ".jpg"
 	destinationBaseDir := fmt.Sprintf("%s/%s", r.RootDir, item.Destination.Path)
-	destinationFileName := fmt.Sprintf("%s/%s%s%d.jpg", destinationBaseDir, item.Destination.Name, r.DestinationSuffex, i)
+	destinationFileName := fmt.Sprintf("%s/%s%s%s.jpg", destinationBaseDir, item.Destination.Name, r.DestinationSuffex, destinationImageNo)
 
 	ensureBaseDir(destinationBaseDir)
 
