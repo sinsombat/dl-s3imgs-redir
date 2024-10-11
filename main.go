@@ -59,14 +59,8 @@ func download(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sourceSuffix := strings.Trim(r.PostFormValue("sourceSuffix"), " ")
-	if sourceSuffix == "" {
-		sourceSuffix = "-L"
-	}
 
 	destinationSuffix := strings.Trim(r.PostFormValue("destinationSuffix"), " ")
-	if destinationSuffix == "" {
-		destinationSuffix = "-a"
-	}
 
 	// Get uploaded file from request
 	file, header, err := r.FormFile("file")

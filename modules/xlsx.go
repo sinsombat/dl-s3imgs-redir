@@ -22,9 +22,6 @@ func (x *Xlsx) Read() (result []Data, err error) {
 	for _, sheet := range excelFile.Sheets {
 		rows := sheet.Rows[1:] // skip header row
 		for _, row := range rows {
-			if len(row.Cells) <= 4 {
-				return
-			}
 			col0 := strings.Trim(row.Cells[0].Value, " ")
 			col1 := strings.Trim(row.Cells[1].Value, " ")
 			col2 := strings.Trim(row.Cells[2].Value, " ")
